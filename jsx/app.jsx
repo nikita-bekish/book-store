@@ -17,8 +17,8 @@ const PRODUCTS = [
   { id: 0, src: 'images/proexpress-cover.jpg', title: 'Pro Express.js', url: 'http://amzn.to/1D6qiqk' },
   { id: 1, src: 'images/practicalnode-cover.jpeg', title: 'Practical Node.js', url: 'http://amzn.to/NuQ0fm' },
   { id: 2, src: 'images/expressapiref-cover.jpg', title: 'Express API Reference', url: 'http://amzn.to/1xcHanf' },
-  { id: 3, src: 'images/reactquikly-cover.jpg', title: 'React Quickly', url: 'http://www.manning.com/books/react-quickly' },
-  { id: 4, src: 'images/fullstack-cover.jpg', title: 'Full Stack Javascript', url: 'http://www.apress.com/9781484217504' },
+  { id: 3, src: 'images/reactquickly-cover.jpg', title: 'React Quickly', url: 'http://www.manning.com/books/react-quickly' },
+  { id: 4, src: 'images/fullstack-cover.png', title: 'Full Stack Javascript', url: 'http://www.apress.com/9781484217504' },
 ];
 
 const Heading = () => {
@@ -30,11 +30,51 @@ const Copy = () => {
 };
 
 class App extends React.Component {
-  // ...
+  componentWillReceiveProps(nextProps) {
+    this.isModal = (nextProps.location.state &&
+      nextProps.location.state.modal)
+    if (this.isModal &&
+      nextProps.location.key !== this.props.location.key) {
+        this.previousChildren = this.props.children
+      }
+  }
+  render() {
+    console.log('Modal: ', this.isModal)
+    return (
+      <div className="well">
+        <Heading />
+        <div>
+          {(this.isModal) ? this.previousChildren : this.props.children}
+          {(this.isModal) ? <Modal isOpen={true} returnTo={this.props.location.state.returnTo}>
+              {this.props.children}
+            </Modal> : ''}
+        </div>
+      </div>
+    )
+  }
 }
 
 class Index extends React.Component {
-  // ...
+  render() {
+    return (
+      <div>
+        <Copy />
+        <p><Link to="/cart" className="btn btn-danger">Cart</Link></p>
+        <div>
+          {PRODUCTS.map(picture => (
+            <Link key={picture.id}
+              to={{pathname: `/products/${picture.id}`,
+              state: { modal: true,
+                returnTo: this.props.location.pathname}
+              }
+            }>
+              <img style={{ margin: '10px' }} src={picture.src} height="100" />
+            </Link>
+          ))}
+        </div>
+      </div>
+    )
+  }
 }
 
 let cartItems = {};
